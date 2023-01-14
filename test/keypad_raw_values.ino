@@ -1,3 +1,5 @@
+//Variable for keypad input
+int keyIn = 0;
 //Array to store keypad raw values
 int keyVals [16] = {
   1, 2, 3, 10,

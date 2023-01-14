@@ -26,7 +26,7 @@
 ## Table Of Contents
 
 * [About the Project](#about-the-project)
-* [Built With](#built-with)
+* [Parts](#parts)
 * [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
@@ -37,7 +37,7 @@
 
 ## About The Project
 ## ⚠️ WORK IN PROGRESS ⚠️
-![Screen Shot](main.jpg)
+![Main](images/main.jpg)
 
 
 Here I'll try to explain and show how I made this custom alarm panel for Home Assistant with a NodeMCU ESP8266
@@ -48,7 +48,6 @@ Here I'll try to explain and show how I made this custom alarm panel for Home As
 * Matrix 4x4 Keypad
 * RC522
 * Resistors:
-  * x1 47Ω
   * x1 47Ω
   * x1 100Ω
   * x1 150Ω
@@ -66,59 +65,24 @@ Here I'll try to explain and show how I made this custom alarm panel for Home As
 
 We'll start with the Keypad, in this case I will be using a 4x4 one, you can use a 4x3 but you will need to change some things in [_keypad_custom.h_](https://github.com/aronkahrs-us/ESPHome-Alarm-Panel-Keypad-Rfid-Display/blob/main/ESPHome/keypad_custom.h).
 
+### Keypad
+
 We could use 8 Digital pins of our NodeMCU to connect the keypad, _and if you only want the keypad functionality it's recommended_, but we still need to connect the RC522 and the Display, so we'll really need those pins later, what we are going to do to "free" pins is basically turning the keypad into a selectable voltage divider circuit, where each button is selecting a different divider configuration, resulting in a different voltage which we'll be measuring to determine which key was pressed.
 
+![Keypad](images/keypad_connection.png)
+> Ignore the ESP32 Tag, just connect in the respective pins on the ESP8266(In this case we connect, 3.3V, GND and A0)
 
+#### At this point we can test the keypad, just flash the [_keypad_raw_values_](https://github.com/aronkahrs-us/ESPHome-Alarm-Panel-Keypad-Rfid-Display/blob/main/test/keypad_raw_values.ino) file from the Arduino IDE, and open Serial Monitor.
 
-### Prerequisites
+You will need to store the raw values corresponding to each key, that's the value from the voltage divider circuit keypad and it's what we will use to determine the pressed key.
 
-This is an example of how to list things you need to use the software and how to install them.
+Once we have that data, we may like to know if it's right and will work, so we'll pass the values we got to [_keypad_test_](https://github.com/aronkahrs-us/ESPHome-Alarm-Panel-Keypad-Rfid-Display/blob/main/test/keypad_test.ino), if you are getting the correct values we are ready for the next step, if not check the connections and retry the last step, also you can play a bit with the _range_ value.
 
-* npm
+### RFID
 
-```sh
-npm install npm@latest -g
-```
+For RFID we are going to use the RC522,_you may use some other part, look the connections for your specific part_, the RC522 has also 8 pins(we only use 7), GND, 3.3V (which don't use any GPIO), SDA, SCK, MOSI, MISO and RST, it also has an IRQ but we don't use it, so that is 5 GPIO pins.
 
-### Installation
-
-1. Get a free API Key at [https://example.com](https://example.com)
-
-2. Clone the repo
-
-```sh
-git clone https://github.com/your_username_/Project-Name.git
-```
-
-3. Install NPM packages
-
-```sh
-npm install
-```
-
-4. Enter your API in `config.js`
-
-```JS
-const API_KEY = 'ENTER YOUR API';
-```
-
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-## Contributing
-
-
-
-### Creating A Pull Request
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+We will conect them to D4, D5, D7, D6 and D3 respectively
 
 ## Authors
 
@@ -127,5 +91,5 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 ## Acknowledgements
 
 * [Connect A 4×4 Keypad To One Arduino Input](https://www.the-diy-life.com/connect-a-4x4-keypad-to-one-arduino-input/)
-* [Othneil Drew](https://github.com/othneildrew/Best-README-Template)
+* [RFID Reader with NodeMCU (RC522)](https://miliohm.com/rc522-rfid-reader-with-nodemcu/)
 * [ImgShields](https://shields.io/)

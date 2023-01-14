@@ -15,7 +15,6 @@ api:
 
 ota:
 
-
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
@@ -28,7 +27,8 @@ wifi:
     password: "TOBQxpayIhQj"
 
 captive_portal:
-    
+
+# Create the custom text sensors for the keypad values
 text_sensor:
 - platform: custom
   lambda: |-
@@ -41,12 +41,8 @@ text_sensor:
       icon: "mdi:dialpad"
     - name: "Keypad_live"
       icon: "mdi:dialpad"
-
-- platform: homeassistant
-  name: "Alarm"
-  entity_id: alarm_control_panel.alarmo
-  id: alarmo
-
+      
+# Create the custom binary sensors
 binary_sensor:
   - platform: custom
     lambda: |-
@@ -57,20 +53,15 @@ binary_sensor:
     binary_sensors:
       - name: "Arm"
       - name: "Disarm"
-
+# Create the custom binary sensors for the RFID tags
   - platform: rc522
-    uid: 9C-9D-0B-38
+    uid: XX-XX-XX-XX
     name: "Alarmo Tag 1"
   - platform: rc522
-    uid: FC-71-F4-37
-    name: "Alarmo Tag 2"
-  - platform: rc522
-    uid: 13-C5-B3-A9
+    uid: XX-XX-XX-XX
     name: "Alarmo Card 1"
-  - platform: rc522
-    uid: 33-D5-D9-A9
-    name: "Alarmo Card 2"
-
+    
+# Create the buzzer output
 output:
   - platform: esp8266_pwm
     pin: GPIO15
@@ -78,7 +69,7 @@ output:
 
 rtttl:
   output: rtttl_out
-
+# Create a number template to control the display brightness
 number:
   - platform: template
     name: "Alarm keypad brightness"
@@ -88,7 +79,7 @@ number:
     max_value: 15
     step: 1
 
-
+# Setup the SPI for the RV522 and Display
 spi:
   - id: "RC522"
     clk_pin: D5
@@ -97,8 +88,9 @@ spi:
   - id: "Display"
     clk_pin: D2
     mosi_pin: D0
-
-rc522_spi: # or rc522_i2c
+    
+# Create the RC522 Sensor
+rc522_spi:
   spi_id: "RC522"
   cs_pin: D4
   update_interval: 1s
@@ -106,7 +98,8 @@ rc522_spi: # or rc522_i2c
     then:
       - homeassistant.tag_scanned: !lambda 'return x;'
       - rtttl.play: 'two short:d=4,o=5,b=100:16e6,16e6'
-
+      
+# Initialize the Display
 display:
   - platform: max7219
     spi_id: "Display"
@@ -142,7 +135,7 @@ display:
           it.printf(2, "%.0f", id(keypad_live).state);
         }
         it.set_intensity(id(keypad_brightness).state);
-
+# "Import" Home assistant entities states
 sensor:
   - platform: homeassistant
     name: "live text"
@@ -182,4 +175,3 @@ sensor:
                                     then:
                                       - rtttl.play: 'siren:d=8,o=5,b=100:e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d'
                                       - delay: 0.5s
-                              else:

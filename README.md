@@ -13,8 +13,6 @@
     <a href="https://github.com/aronkahrs-us/ESPHome-Alarm-Panel-Keypad-Rfid-Display"><strong>Explore the docs »</strong></a>
     <br/>
     <br/>
-    <a href="https://github.com/aronkahrs-us/ESPHome-Alarm-Panel-Keypad-Rfid-Display">View Demo</a>
-    .
     <a href="https://github.com/aronkahrs-us/ESPHome-Alarm-Panel-Keypad-Rfid-Display/issues">Report Bug</a>
     .
     <a href="https://github.com/aronkahrs-us/ESPHome-Alarm-Panel-Keypad-Rfid-Display/issues">Request Feature</a>
@@ -34,7 +32,7 @@
 * [Home Assistant](#home-assistant)
 * [ESPHome](#esphome)
 * [Authors](#authors)
-* [Acknowledgements](#acknowledgements)
+* [Inspiration and Docs](#inspiration-and-docs)
 
 ## About The Project
 ## ⚠️ WORK IN PROGRESS ⚠️
@@ -417,7 +415,7 @@ Hope this is useful for someone, keep going smart!
 
 * **Aron Kahrs** - [Aron Kahrs](https://github.com/aronkahrs-us)
 
-## Inspiration and docs
+## Inspiration and Docs
 
 * [Connect A 4×4 Keypad To One Arduino Input](https://www.the-diy-life.com/connect-a-4x4-keypad-to-one-arduino-input/)
 * [RFID Reader with NodeMCU (RC522)](https://miliohm.com/rc522-rfid-reader-with-nodemcu/)

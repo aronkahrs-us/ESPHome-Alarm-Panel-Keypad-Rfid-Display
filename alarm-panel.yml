@@ -1,0 +1,185 @@
+esphome:
+  name: alarmo-keypad
+  includes:
+    - keypad_custom.h
+    - binary_sensor_custom.h
+
+esp8266:
+  board: nodemcuv2
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  power_save_mode: none
+  
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esphome-Web-F2491E"
+    password: "TOBQxpayIhQj"
+
+captive_portal:
+    
+text_sensor:
+- platform: custom
+  lambda: |-
+    auto my_custom_sensor = new MyCustomTextSensor();
+    App.register_component(my_custom_sensor);
+    return {my_custom_sensor->code,my_custom_sensor->live};
+
+  text_sensors:
+    - name: "Keypad"
+      icon: "mdi:dialpad"
+    - name: "Keypad_live"
+      icon: "mdi:dialpad"
+
+- platform: homeassistant
+  name: "Alarm"
+  entity_id: alarm_control_panel.alarmo
+  id: alarmo
+
+binary_sensor:
+  - platform: custom
+    lambda: |-
+      auto my_custom_sensor = new MyCustomBinarySensor();
+      App.register_component(my_custom_sensor);
+      return {my_custom_sensor->arm,my_custom_sensor->disarm};
+
+    binary_sensors:
+      - name: "Arm"
+      - name: "Disarm"
+
+  - platform: rc522
+    uid: 9C-9D-0B-38
+    name: "Alarmo Tag 1"
+  - platform: rc522
+    uid: FC-71-F4-37
+    name: "Alarmo Tag 2"
+  - platform: rc522
+    uid: 13-C5-B3-A9
+    name: "Alarmo Card 1"
+  - platform: rc522
+    uid: 33-D5-D9-A9
+    name: "Alarmo Card 2"
+
+output:
+  - platform: esp8266_pwm
+    pin: GPIO15
+    id: rtttl_out
+
+rtttl:
+  output: rtttl_out
+
+number:
+  - platform: template
+    name: "Alarm keypad brightness"
+    id: keypad_brightness
+    optimistic: true
+    min_value: 0
+    max_value: 15
+    step: 1
+
+
+spi:
+  - id: "RC522"
+    clk_pin: D5
+    miso_pin: D6
+    mosi_pin: D7
+  - id: "Display"
+    clk_pin: D2
+    mosi_pin: D0
+
+rc522_spi: # or rc522_i2c
+  spi_id: "RC522"
+  cs_pin: D4
+  update_interval: 1s
+  on_tag:
+    then:
+      - homeassistant.tag_scanned: !lambda 'return x;'
+      - rtttl.play: 'two short:d=4,o=5,b=100:16e6,16e6'
+
+display:
+  - platform: max7219
+    spi_id: "Display"
+    cs_pin: D1
+    num_chips: 1
+    id: "Segment"
+    intensity: 8
+    lambda: |-
+        it.print("        ");
+        if (id(alarm_state).state == 10000) {
+          it.print("Disarmed");
+        } else if (id(alarm_state).state == 10001) {
+          it.print("Arming");
+        } else if (id(alarm_state).state == 10002) {
+          it.print("Away");
+        } else if (id(alarm_state).state == 10003) {
+          it.print("Home");
+        } else if (id(alarm_state).state == 10004) {
+          it.print("Night");
+        } else if (id(alarm_state).state == 10005) {
+          it.print("Vacation");
+        } else if (id(alarm_state).state == 10006) {
+          it.print("Custom");
+        } else if (id(alarm_state).state == 10007) {
+          it.print("Pending");
+        } else if (id(alarm_state).state == 10008) {
+          it.print("ALERTA");
+        } else if (id(alarm_state).state == 10009) {
+          it.print("Unavail");
+        } else if (id(alarm_state).state == 10010) {
+          it.print("Unknown");
+        } else {
+          it.printf(2, "%.0f", id(keypad_live).state);
+        }
+        it.set_intensity(id(keypad_brightness).state);
+
+sensor:
+  - platform: homeassistant
+    name: "live text"
+    entity_id: sensor.keypad_live
+    id: keypad_live
+  - platform: homeassistant
+    name: "Alarm state"
+    entity_id: sensor.alarm_state
+    id: alarm_state
+    on_value:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(alarm_state).state == 10000;'
+            then:
+              - rtttl.play: 'disarmed:d=4,o=5,b=100:16e5,16d5,16c5'
+            else:
+              - if:
+                  condition:
+                    lambda: 'return id(alarm_state).state == 10001;'
+                  then:
+                    - rtttl.play: 'arming:d=4,o=5,b=100:16c5,p,16c5,p,16c5'
+                  else:
+                    - if:
+                        condition:
+                          lambda: 'return id(alarm_state).state == 10002;'
+                        then:
+                          - rtttl.play: 'armed:d=4,o=5,b=100:16c5,16d5,16e5'
+                        else:
+                          - if:
+                              condition:
+                                lambda: 'return id(alarm_state).state == 10008;'
+                              then:
+                                - while:
+                                    condition:
+                                      lambda: 'return id(alarm_state).state != 10008;'
+                                    then:
+                                      - rtttl.play: 'siren:d=8,o=5,b=100:e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d'
+                                      - delay: 0.5s
+                              else:

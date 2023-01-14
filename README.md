@@ -60,7 +60,6 @@ Here I'll try to explain and show how I made this custom alarm panel for Home As
 * Buzzer
 * Protoboard( I used a 80x120mm, but you can use any size, or any other platform you like)
 * Jumper Wires
-- Patience and Creativity 😆
 
 ## Getting Started
 

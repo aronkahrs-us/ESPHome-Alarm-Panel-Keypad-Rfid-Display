@@ -389,7 +389,7 @@ sensor:
                                     condition:
                                       lambda: 'return id(alarm_state).state == 8;'
                                     then:
-                                      - rtttl.play: 'siren:d=8,o=5,b=100:e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d'
+                                      - rtttl.play: 'siren:d=8,o=5,b=100:e,d'
                                       - delay: 0.5s
 
 ```

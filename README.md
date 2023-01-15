@@ -114,30 +114,19 @@ We'll need to create a template sensor, a helper and 3 automations in Home Assis
   sensors:
     alarm_state:
       value_template: >-
+        {% set alarm_states =  {
+            'disarmed' : 0,
+            'arming' : 1,
+            'armed_away' : 2,
+            'armed_home' : 3,
+            'armed_night' : 4,
+            'armed_vacation' : 5,
+            'armed_custom_bypass' : 6,
+            'pending' : 7,
+            'triggered' : 8 } %}
+        {% set state =  states.alarm_control_panel.alarmo.state %}
         {% if states('timer.keypad_numbers') == "idle" %}
-          {% if states('alarm_control_panel.alarmo') == "disarmed" %}
-            10000
-          {% elif states('alarm_control_panel.alarmo') == "arming" %}
-            10001
-          {% elif states('alarm_control_panel.alarmo') == "armed_away" %}
-            10002
-          {% elif states('alarm_control_panel.alarmo') == "armed_home" %}
-            10003
-          {% elif states('alarm_control_panel.alarmo') == "armed_night" %}
-            10004
-          {% elif states('alarm_control_panel.alarmo') == "armed_vacation" %}
-            10005
-          {% elif states('alarm_control_panel.alarmo') == "armed_custom_bypass" %}
-            10006
-          {% elif states('alarm_control_panel.alarmo') == "pending" %}
-            10007
-          {% elif states('alarm_control_panel.alarmo') == "triggered" %}
-            10008
-          {% elif states('alarm_control_panel.alarmo') == "unavailable" %}
-            10009
-          {% elif states('alarm_control_panel.alarmo') == "unknown" %}
-            10010
-          {% endif %}
+          {{ alarm_states[state] if state in alarm_states else 9 }}
         {% else %}
           {{ states('sensor.keypad_live') }}
         {% endif %}
@@ -338,28 +327,26 @@ display:
     intensity: 8
     lambda: |-
         it.print("        ");
-        if (id(alarm_state).state == 10000) {
+        if (id(alarm_state).state == 0) {
           it.print("Disarmed");
-        } else if (id(alarm_state).state == 10001) {
+        } else if (id(alarm_state).state == 1) {
           it.print("Arming");
-        } else if (id(alarm_state).state == 10002) {
+        } else if (id(alarm_state).state == 2) {
           it.print("Away");
-        } else if (id(alarm_state).state == 10003) {
+        } else if (id(alarm_state).state == 3) {
           it.print("Home");
-        } else if (id(alarm_state).state == 10004) {
+        } else if (id(alarm_state).state == 4) {
           it.print("Night");
-        } else if (id(alarm_state).state == 10005) {
+        } else if (id(alarm_state).state == 5) {
           it.print("Vacation");
-        } else if (id(alarm_state).state == 10006) {
+        } else if (id(alarm_state).state == 6) {
           it.print("Custom");
-        } else if (id(alarm_state).state == 10007) {
+        } else if (id(alarm_state).state == 7) {
           it.print("Pending");
-        } else if (id(alarm_state).state == 10008) {
+        } else if (id(alarm_state).state == 8) {
           it.print("ALERTA");
-        } else if (id(alarm_state).state == 10009) {
+        } else if (id(alarm_state).state == 9) {
           it.print("Unavail");
-        } else if (id(alarm_state).state == 10010) {
-          it.print("Unknown");
         } else {
           it.printf(2, "%.0f", id(keypad_live).state);
         }
@@ -378,29 +365,29 @@ sensor:
       then:
         - if:
             condition:
-              lambda: 'return id(alarm_state).state == 10000;'
+              lambda: 'return id(alarm_state).state == 0;'
             then:
               - rtttl.play: 'disarmed:d=4,o=5,b=100:16e5,16d5,16c5'
             else:
               - if:
                   condition:
-                    lambda: 'return id(alarm_state).state == 10001;'
+                    lambda: 'return id(alarm_state).state == 1;'
                   then:
                     - rtttl.play: 'arming:d=4,o=5,b=100:16c5,p,16c5,p,16c5'
                   else:
                     - if:
                         condition:
-                          lambda: 'return id(alarm_state).state == 10002;'
+                          lambda: 'return id(alarm_state).state == 2;'
                         then:
                           - rtttl.play: 'armed:d=4,o=5,b=100:16c5,16d5,16e5'
                         else:
                           - if:
                               condition:
-                                lambda: 'return id(alarm_state).state == 10008;'
+                                lambda: 'return id(alarm_state).state == 8;'
                               then:
                                 - while:
                                     condition:
-                                      lambda: 'return id(alarm_state).state != 10008;'
+                                      lambda: 'return id(alarm_state).state == 8;'
                                     then:
                                       - rtttl.play: 'siren:d=8,o=5,b=100:e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d,e,d'
                                       - delay: 0.5s

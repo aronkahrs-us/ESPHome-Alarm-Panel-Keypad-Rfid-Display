@@ -1,8 +1,5 @@
 <br/>
 <p align="center">
-  <a href="https://github.com/aronkahrs-us/ESPHome-Alarm-Panel-Keypad-Rfid-Display">
-    <img src="https://materialdesignicons.com/api/download/B732FAD7-93A7-478E-810F-835069DE6EDB/000000/1/FFFFFF/0/48" alt="Logo" width="8%" height="8%">
-  </a>
 
   <h1 align="center">ESPHome Alarm Panel</h1>
 
@@ -31,6 +28,7 @@
   * [Display](#display)
 * [Home Assistant](#home-assistant)
 * [ESPHome](#esphome)
+* [3D Case](#3d-case)
 * [Authors](#authors)
 * [Inspiration and Docs](#inspiration-and-docs)
 
@@ -396,6 +394,11 @@ sensor:
 Once we have edited it we'll install it, **make sure you downloaded and have _binary_sensor_custom.h_ and _keypad_custom.h_ in place before installing**, in my case I'll install it via USB, so I'll select _"Plug into this computer"_, download the file and install it from the [ESPHome Wizard](https://web.esphome.io/), but you can install it however you want.
 
 Once it's installed everything should work, if it does not, check every connection and the code, if it still does not work feel free to contact me for help!
+
+## 3D Case
+![Case 3d model](images/Case_model.png)
+![Case progress](images/Case_progress.jpeg)
+![Case finish](images/Case_finish.jpeg)
 
 Hope this is useful for someone, keep going smart!
 ## Authors
